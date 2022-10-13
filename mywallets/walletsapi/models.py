@@ -12,7 +12,7 @@ class Walet(models.Model):
         (VISA, 'visa card'),
         (MASTER_CARD, 'master card card'),
     ]
-    type = models.CharField(verbose_name='type', choices=CARD_TYPE, default=VISA)
+    type = models.CharField(verbose_name='type', max_length=11, choices=CARD_TYPE, default=VISA)
     USD = 'USD'
     EUR = 'EUR'
     UAH = 'UAH'
@@ -22,8 +22,8 @@ class Walet(models.Model):
         (UAH, 'Hryvnia'),
     ]
     currency = models.CharField(verbose_name='currency', max_length=3, choices=CURRENCY_TYPE, default=USD)
-    balance = models.DecimalField(verbose_name='balance', decimal_places=2)
-    user_id = models.ForeignKey(User, verbose_name='user', on_delete=models.SET_NULL)
+    balance = models.DecimalField(verbose_name='balance', max_digits=11, decimal_places=2)
+    user_id = models.ForeignKey(User, verbose_name='user', on_delete=models.CASCADE)
     created_on = models.DateTimeField(verbose_name='creating_time', auto_now_add=True)
     modefied_on = models.DateTimeField(verbose_name='modefied_time', auto_now=True)
 
