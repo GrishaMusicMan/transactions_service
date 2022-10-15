@@ -20,5 +20,5 @@ from walletsapi.views import WalletsAPIView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/wallets/', WalletsAPIView.as_view())
+    path('wallets/', WalletsAPIView.as_view())
 ]
