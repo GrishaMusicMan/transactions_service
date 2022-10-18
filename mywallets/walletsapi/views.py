@@ -1,43 +1,56 @@
-from django.forms import model_to_dict
 from rest_framework import generics
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
-import random
+from random import choice
 from .Serialazers import WalletSerialazer
-from .models import Walet
+from .models import Wallet
 from .models import User
+from string import ascii_uppercase, digits
+
 
 class WalletsAPIView(APIView):
 
     def get(self, request):
-        lst = Walet.objects.all().values()
-        return Response(list(lst))
+        lst = Wallet.objects.all()
+        return Response(WalletSerialazer(lst, many=True).data)
 
     def post(self, request):
-        post_new = Walet.objects.create(
+        serializer = WalletSerialazer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        post_new = Wallet.objects.create(
             name=self.create_wallet_name(),
             type=request.data['type'],
             currency=request.data['currency'],
-            balance=3,
+            balance=self.start_sum(request),
             user_id=User(1)
         )
-        return Response({'post': model_to_dict(post_new)})
+        return Response(WalletSerialazer(post_new).data)
 
     def create_wallet_name(self):
-        simbols = 'QWERTYUIOPLKJHGFDSAZXCVBNM0123456789'
-        new_name = []
-        while len(new_name) < 8:
-            new_name.append(simbols[random.randint(0, len(simbols) - 1)])
-        return ''.join(new_name)
+        return ''.join([choice(ascii_uppercase + digits) for _ in range(8)])
+
+    def start_sum(self, request):
+        if request.data['currency'] == "USD" or request.data['currency'] == "EUR":
+            return 3
+        else:
+            return 100
 
 
+class WalletsAPIName(APIView):
 
+    def get(self, request, namewalleturl):
+        lst = Wallet.objects.get(name=namewalleturl)
+        return Response(WalletSerialazer(lst).data)
 
-
+    def delete(self, request, namewalleturl):
+        wlt = Wallet.objects.get(name=namewalleturl)
+        wlt.delete()
+        return Response({"delete": "success"})
 
 # class WalletsAPIView(generics.ListAPIView):
 #
-#     queryset = Walet.objects.all()
+#     queryset = Wallet.objects.all()
 #     serializer_class = WalletSerialazer

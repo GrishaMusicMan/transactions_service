@@ -16,9 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from walletsapi.views import WalletsAPIView
+from walletsapi.views import WalletsAPIView, WalletsAPIName
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('wallets/', WalletsAPIView.as_view())
+    path('wallets/', WalletsAPIView.as_view()),
+    path('wallets/<str:namewalleturl>/', WalletsAPIName.as_view())
 ]

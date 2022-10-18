@@ -4,7 +4,7 @@ from django.db import models
 User = get_user_model()
 
 
-class Walet(models.Model):
+class Wallet(models.Model):
     name = models.CharField(verbose_name='name', max_length=8)
     VISA = 'VISA'
     MASTER_CARD = 'MASTER_CARD'
@@ -27,14 +27,18 @@ class Walet(models.Model):
     created_on = models.DateTimeField(verbose_name='creating_time', auto_now_add=True)
     modefied_on = models.DateTimeField(verbose_name='modefied_time', auto_now=True)
 
-# class Transactions(models.Model):
-#     sender = models.CharField(verbose_name='sender', max_length=8)
-#     receiver = models.CharField(verbose_name='receiver', max_length=8)
-#     transer_amount = models.DecimalField(verbose_name='transer_amount', decimal_places=2)
-#     commision = models.DecimalField(verbose_name='commision', decimal_places=2)
-#     STATUS_TYPE = (
-#         ('PAID ', 'PAID '),
-#         ('FAILED', 'FAILED'),
-#     )
-#     status = models.CharField(verbose_name='status', choices=STATUS_TYPE)
-#     timestamp = models.DateTimeField(verbose_name='timestamp', auto_now_add=True)
+
+class Transactions(models.Model):
+    sender = models.ForeignKey('Wallet', verbose_name='sender', related_name='to_sender', on_delete=models.CASCADE)
+    receiver = models.ForeignKey('Wallet', verbose_name='receiver', related_name='from_receiver',
+                                 on_delete=models.CASCADE)
+    transfer_amount = models.DecimalField(verbose_name='transfer_amount', max_digits=11, decimal_places=2)
+    commision = models.DecimalField(verbose_name='commision', max_digits=11, decimal_places=2)
+    PAID = 'PAID'
+    FAILED = 'FAILED'
+    STATUS_TYPE = [
+        (PAID, 'PAID'),
+        (FAILED, 'FAILED'),
+    ]
+    status = models.CharField(verbose_name='status', max_length=6, choices=STATUS_TYPE)
+    timestamp = models.DateTimeField(verbose_name='timestamp', auto_now_add=True)
