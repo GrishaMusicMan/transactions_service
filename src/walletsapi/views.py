@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
 from random import choice
-from .Serialazers import WalletSerialazer
+from .serialazers import WalletSerialazer
 from .models import Wallet
 from .models import User
 from string import ascii_uppercase, digits
