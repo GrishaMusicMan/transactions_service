@@ -1,4 +1,4 @@
-"""src URL Configuration
+"""mywallets URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.1/topics/http/urls/
@@ -15,11 +15,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-
-from walletsapi.views import WalletsAPIView, WalletsAPIName
+from walletsapi.views import (
+    WalletsAPIView,
+    WalletsByName,
+    TransactionsByID,
+    TransactionsByWalletsName,
+    CreateTransaction
+    )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('wallets/', WalletsAPIView.as_view()),
-    path('wallets/<str:namewalleturl>/', WalletsAPIName.as_view())
+    path('wallets/transactions/', CreateTransaction.as_view()),
+    path('wallets/<str:namewalleturl>/', WalletsByName.as_view()),
+    path('wallets/transactions/<int:tran_id>/', TransactionsByID.as_view()),
+    path('wallets/transactions/<str:wallet_name>/', TransactionsByWalletsName.as_view())
+
 ]

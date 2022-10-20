@@ -27,6 +27,9 @@ class Wallet(models.Model):
     created_on = models.DateTimeField(verbose_name='creating_time', auto_now_add=True)
     modefied_on = models.DateTimeField(verbose_name='modefied_time', auto_now=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Transactions(models.Model):
     sender = models.ForeignKey('Wallet', verbose_name='sender', related_name='to_sender', on_delete=models.CASCADE)
@@ -42,3 +45,6 @@ class Transactions(models.Model):
     ]
     status = models.CharField(verbose_name='status', max_length=6, choices=STATUS_TYPE)
     timestamp = models.DateTimeField(verbose_name='timestamp', auto_now_add=True)
+
+    def __str__(self):
+        return f'tr_{self.pk}, sender - {self.sender}, receiver - {self.receiver}, time - {self.timestamp}'
