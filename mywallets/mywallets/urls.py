@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from walletsapi.views import (
     WalletsAPIView,
     WalletsByName,
@@ -30,6 +30,8 @@ urlpatterns = [
     path('wallets/transactions/', CreateTransaction.as_view()),
     path('wallets/<str:namewalleturl>/', WalletsByName.as_view()),
     path('wallets/transactions/<int:tran_id>/', TransactionsByID.as_view()),
-    path('wallets/transactions/<str:wallet_name>/', TransactionsByWalletsName.as_view())
+    path('wallets/transactions/<str:wallet_name>/', TransactionsByWalletsName.as_view()),
+    path('auth/', include('djoser.urls')),
+    re_path(r'^auth/', include('djoser.urls.authtoken')),
 
 ]

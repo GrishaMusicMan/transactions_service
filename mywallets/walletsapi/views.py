@@ -29,7 +29,7 @@ class WalletsAPIView(APIView):
             )
             return Response(WalletSerialazer(post_new).data)
         else:
-            return Response({"error": "you can't have more than 5 wallets"})
+            return Response({"detail": "you can't have more than 5 wallets"})
 
     def create_wallet_name(self):
         return ''.join([choice(ascii_uppercase + digits) for _ in range(8)])
@@ -50,12 +50,14 @@ class WalletsByName(APIView):
     def delete(self, request, namewalleturl):
         wlt = Wallet.objects.get(name=namewalleturl)
         wlt.delete()
+        wlt.save()
         return Response({"delete": "success"})
 
 
 class CreateTransaction(APIView):
 
     def get(self, request):
+
         lst = Transactions.objects.all()
         return Response(TransactionSerialazer(lst, many=True).data)
 
@@ -83,9 +85,9 @@ class CreateTransaction(APIView):
 
                 return Response(TransactionSerialazer(tran_new).data)
             else:
-                return Response({"error": "not enough money"})
+                return Response({"detail": "not enough money"})
         else:
-            return Response({"error": "transactions are available only for wallets with the same currency"})
+            return Response({"detail": "transactions are available only for wallets with the same currency"})
 
     def check_current(self, request):
         sender = Wallet.objects.get(name=request.data['sender'])
