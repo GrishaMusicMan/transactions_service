@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from walletsapi.views import (
     WalletsAPIView,
     WalletsByName,
@@ -25,6 +25,7 @@ from walletsapi.views import (
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('drf-auth/', include('rest_framework.urls')),
     path('wallets/', WalletsAPIView.as_view()),
     path('wallets/transactions/', CreateTransaction.as_view()),
     path('wallets/<str:namewalleturl>/', WalletsByName.as_view()),

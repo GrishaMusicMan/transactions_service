@@ -12,21 +12,24 @@ from string import ascii_uppercase, digits
 class WalletsAPIView(APIView):
 
     def get(self, request):
-        lst = Wallet.objects.all()
+        lst = Wallet.objects.filter(user_id=self.request.user.id)
         return Response(WalletSerialazer(lst, many=True).data)
 
     def post(self, request):
         serializer = WalletSerialazer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        post_new = Wallet.objects.create(
-            name=self.create_wallet_name(),
-            type=request.data['type'],
-            currency=request.data['currency'],
-            balance=self.start_sum(request),
-            user_id=User(1)
-        )
-        return Response(WalletSerialazer(post_new).data)
+        if not len(Wallet.objects.filter(user_id=request.user)) > 4:
+            post_new = Wallet.objects.create(
+                name=self.create_wallet_name(),
+                type=request.data['type'].upper(),
+                currency=request.data['currency'],
+                balance=self.start_sum(request),
+                user_id=User(self.request.user.id)
+            )
+            return Response(WalletSerialazer(post_new).data)
+        else:
+            return Response({"error": "you can't have more than 5 wallets"})
 
     def create_wallet_name(self):
         return ''.join([choice(ascii_uppercase + digits) for _ in range(8)])
@@ -67,13 +70,13 @@ class CreateTransaction(APIView):
                     sender=Wallet.objects.get(name=request.data['sender']),
                     receiver=Wallet.objects.get(name=request.data['receiver']),
                     transfer_amount=request.data['transfer_amount'],
-                    commision=0,
+                    commision=self.get_commission(request),
                     status='PAID'
                 )
 
                 sender = Wallet.objects.get(name=request.data['sender'])
                 receiver = Wallet.objects.get(name=request.data['receiver'])
-                sender.balance -= decimal.Decimal(request.data['transfer_amount'])
+                sender.balance -= decimal.Decimal(request.data['transfer_amount']) + self.get_commission(request)
                 sender.save()
                 receiver.balance += decimal.Decimal(request.data['transfer_amount'])
                 receiver.save()
@@ -93,6 +96,16 @@ class CreateTransaction(APIView):
         sender = Wallet.objects.get(name=request.data['sender'])
         transfer_amount = request.data['transfer_amount']
         return sender.balance - decimal.Decimal(transfer_amount) >= 0
+
+    def get_commission(self, request):
+        sender = Wallet.objects.get(name=request.data['sender'])
+        receiver = Wallet.objects.get(name=request.data['receiver'])
+        transfer_amount = request.data['transfer_amount']
+
+        if sender.user_id == receiver.user_id:
+            return 0
+        else:
+            return decimal.Decimal(transfer_amount) * decimal.Decimal(0.1)
 
 
 class TransactionsByID(APIView):
