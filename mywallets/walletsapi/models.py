@@ -32,9 +32,10 @@ class Wallet(models.Model):
 
 
 class Transactions(models.Model):
-    sender = models.ForeignKey('Wallet', verbose_name='sender', related_name='to_sender', on_delete=models.CASCADE)
+    sender = models.ForeignKey('Wallet', verbose_name='sender', related_name='to_sender',
+                                on_delete=models.CASCADE)
     receiver = models.ForeignKey('Wallet', verbose_name='receiver', related_name='from_receiver',
-                                 on_delete=models.CASCADE)
+                                on_delete=models.CASCADE)
     transfer_amount = models.DecimalField(verbose_name='transfer_amount', max_digits=11, decimal_places=2)
     commision = models.DecimalField(verbose_name='commision', max_digits=11, decimal_places=2)
     PAID = 'PAID'

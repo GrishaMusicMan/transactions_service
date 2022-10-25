@@ -1,5 +1,6 @@
 import decimal
 from django.db.models import Q
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from random import choice
@@ -44,21 +45,31 @@ class WalletsAPIView(APIView):
 class WalletsByName(APIView):
 
     def get(self, request, namewalleturl):
-        lst = Wallet.objects.get(name=namewalleturl)
-        return Response(WalletSerialazer(lst).data)
+        lst = Wallet.objects.filter(user_id=self.request.user.id)
+        wlt = Wallet.objects.get(name=namewalleturl)
+        if wlt in lst:
+            return Response(WalletSerialazer(wlt).data)
+        else:
+            return Response({"error": "You don't have access"})
 
     def delete(self, request, namewalleturl):
+        lst = Wallet.objects.filter(user_id=self.request.user.id)
         wlt = Wallet.objects.get(name=namewalleturl)
-        wlt.delete()
-        wlt.save()
-        return Response({"delete": "success"})
+        if wlt in lst:
+            wlt.delete()
+            return Response({"delete": "success"})
+        else:
+            return Response({"error": "You don't have access"})
 
 
 class CreateTransaction(APIView):
 
     def get(self, request):
+        user_wallets = Wallet.objects.filter(user_id=self.request.user.id)
+        lst = Transactions.objects.filter(
+            Q(sender__in=user_wallets) | Q(receiver__in=user_wallets)
+        )
 
-        lst = Transactions.objects.all()
         return Response(TransactionSerialazer(lst, many=True).data)
 
     def post(self, request):
