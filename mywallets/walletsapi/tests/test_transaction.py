@@ -134,7 +134,6 @@ class TransactionsTestCase(APITestCase):
         self.client.post(url, data1, format="json")
         self.client.post(url, data2, format="json")
         response = self.client.get(url)
-        # print(response.data)
         new_url = f"/wallets/transactions/{response.data[1]['sender']}/"
         new_response = self.client.get(new_url)
         self.assertEqual(len(new_response.data), 2)
